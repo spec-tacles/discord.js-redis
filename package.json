@@ -15,5 +15,10 @@
   "bugs": {
     "url": "https://github.com/some-plebs/discord.js-redis/issues"
   },
-  "homepage": "https://github.com/some-plebs/discord.js-redis#readme"
+  "homepage": "https://github.com/some-plebs/discord.js-redis#readme",
+  "devDependencies": {
+    "eslint": "^3.19.0",
+    "eslint-config-airbnb-base": "^11.1.3",
+    "eslint-plugin-import": "^2.2.0"
+  }
 }
