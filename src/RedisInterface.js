@@ -51,12 +51,20 @@ module.exports = class RedisInterface {
   }
 
   _setData(type, data) {
-    return this.client.hmsetAsync(`${type}:${data.id}`, data).then(
+    return this.client.hmsetAsync(`${type}:${data.id}`, RedisInterface.clean(data)).then(
       result => this.client.publish(`${type}Set`, data.id).then(() => result));
   }
 
   _deleteData(type, id) {
     return this.client.hdelAsync(`${type}:${id}`).then(
       result => this.client.publish(`${type}Delete`, id).then(() => result));
+  }
+
+  static clean(obj) {
+    const out = {};
+    Object.keys(obj).forEach((key) => {
+      if (!(obj[key] instanceof Object) && obj[key] !== null && typeof obj[key] !== 'undefined') out[key] = obj[key];
+    });
+    return out;
   }
 };

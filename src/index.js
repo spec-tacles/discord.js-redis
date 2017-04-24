@@ -1,14 +1,6 @@
 const ClientDataManager = require('./ClientDataManagerExtension');
 const RedisInterface = require('./RedisInterface');
 
-function cleanObject(obj) {
-  const out = {};
-  Object.keys(obj).forEach((key) => {
-    if (!(obj[key] instanceof Object) && obj[key] !== null && typeof obj[key] !== 'undefined') out[key] = obj[key];
-  });
-  return out;
-}
-
 module.exports = (options) => {
   const r = new RedisInterface(options);
   return (client) => {
@@ -16,10 +8,10 @@ module.exports = (options) => {
     client.dataManager = new ClientDataManager(client, r);
     client.once('ready', () => {
       const q = r.client.multi();
-      client.users.map(u => q.hmsetAsync(`user:${u.id}`, cleanObject(u)));
-      client.channels.map(c => q.hmsetAsync(`channel:${c.id}`, cleanObject(c)));
-      client.guilds.map(g => q.hmsetAsync(`guild:${g.id}`, cleanObject(g)));
-      client.emojis.map(e => q.hmsetAsync(`emoji:${e.id}`, cleanObject(e)));
+      client.users.map(u => q.hmsetAsync(`user:${u.id}`, RedisInterface.clean(u)));
+      client.channels.map(c => q.hmsetAsync(`channel:${c.id}`, RedisInterface.clean(c)));
+      client.guilds.map(g => q.hmsetAsync(`guild:${g.id}`, RedisInterface.clean(g)));
+      client.emojis.map(e => q.hmsetAsync(`emoji:${e.id}`, RedisInterface.clean(e)));
       q.execAsync();
     });
   };
