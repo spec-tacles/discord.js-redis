@@ -24,5 +24,8 @@
   "dependencies": {
     "bluebird": "^3.5.0",
     "redis": "^2.7.1"
+  },
+  "peerDependencies": {
+    "discord.js": "github:hydrabolt/discord.js#master"
   }
 }
