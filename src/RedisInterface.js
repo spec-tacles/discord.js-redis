@@ -39,7 +39,7 @@ module.exports = class RedisInterface {
   }
 
   deleteGuild(guild) {
-    return this._deleteData('guild', guild);
+    return this._deleteData('guild', guild.id);
   }
 
   setEmoji(emoji) {
@@ -47,7 +47,7 @@ module.exports = class RedisInterface {
   }
 
   deleteEmoji(emoji) {
-    return this._setData('emoji', emoji);
+    return this._setData('emoji', emoji.id);
   }
 
   _setData(type, data) {
