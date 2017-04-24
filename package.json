@@ -1,0 +1,19 @@
+{
+  "name": "discord.js-redis",
+  "version": "0.1.0",
+  "description": "Connects Discord.js with Redis.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/some-plebs/discord.js-redis.git"
+  },
+  "author": "Will Nelson <appellation@topkek.pw>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/some-plebs/discord.js-redis/issues"
+  },
+  "homepage": "https://github.com/some-plebs/discord.js-redis#readme"
+}
