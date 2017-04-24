@@ -47,7 +47,19 @@ module.exports = class RedisInterface {
   }
 
   deleteEmoji(emoji) {
-    return this._setData('emoji', emoji.id);
+    return this._deleteData('emoji', emoji.id);
+  }
+
+  setMessage(message) {
+    return this._setData('message', message).then(() => {
+      const cache = message.client.options.messageCacheLifetime;
+      if (cache) return this.client.expire(`message:${message.id}`, cache);
+      return Promise.resolve(null);
+    });
+  }
+
+  deleteMessage(message) {
+    return this._deleteData('message', message.id);
   }
 
   _setData(type, data) {
