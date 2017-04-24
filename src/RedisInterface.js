@@ -1,6 +1,12 @@
+const redis = require('redis');
+const bluebird = require('bluebird');
+
+bluebird.promisifyAll(redis.RedisClient.prototype);
+bluebird.promisifyAll(redis.Multi.prototype);
+
 module.exports = class RedisInterface {
-  constructor(client) {
-    this.client = client;
+  constructor(options = {}) {
+    this.client = redis.createClient(options);
   }
 
   init(client) {
