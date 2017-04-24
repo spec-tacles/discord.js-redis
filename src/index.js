@@ -22,7 +22,7 @@ module.exports = (options) => {
     }
 
     function channelDelete(channel) {
-      return redisClient.hdel(`channel:${channel.id}`);
+      return redisClient.hdelAsync(`channel:${channel.id}`);
     }
 
     discordClient.once('ready', init);
