@@ -22,5 +22,10 @@ module.exports = (options) => {
       return Promise.all(messages.map(m => q.hdelAsync(`message:${m.id}`)))
         .then(() => q.execAsync());
     });
+    client.on('userUpdate', (o, n) => r.setUser(n));
+    client.on('channelUpdate', (o, n) => r.setChannel(n));
+    client.on('emojiUpdate', (o, n) => r.setEmoji(n));
+    client.on('guildUpdate', (o, n) => r.setGuild(n));
+    client.on('messageUpdate', (o, n) => r.setMessage(n));
   };
 };
