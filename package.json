@@ -24,8 +24,8 @@
     "mocha": "^3.3.0"
   },
   "dependencies": {
-    "bluebird": "^3.5.0",
+    "discord.js": "github:hydrabolt/discord.js#master",
     "redis": "^2.7.1",
-    "discord.js": "github:hydrabolt/discord.js#master"
+    "tsubaki": "^1.1.0"
   }
 }

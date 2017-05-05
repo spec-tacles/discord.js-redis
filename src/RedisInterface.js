@@ -1,8 +1,8 @@
 const redis = require('redis');
-const bluebird = require('bluebird');
+const tsubaki = require('tsubaki');
 
-bluebird.promisifyAll(redis.RedisClient.prototype);
-bluebird.promisifyAll(redis.Multi.prototype);
+tsubaki.promisifyAll(redis.RedisClient.prototype);
+tsubaki.promisifyAll(redis.Multi.prototype);
 
 module.exports = class RedisInterface {
   constructor(options = {}) {
