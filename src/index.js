@@ -1,11 +1,8 @@
 const ClientDataManager = require('./ClientDataManagerExtension');
 const RedisInterface = require('./RedisInterface');
-const setup = require('./setup');
 
-module.exports = (options = {}) => {
-  const r = new RedisInterface(options.redis);
-  setup(r, options);
-
+module.exports = (options) => {
+  const r = new RedisInterface(options);
   return (client) => {
     // eslint-disable-next-line no-param-reassign
     client.dataManager = new ClientDataManager(client, r);
