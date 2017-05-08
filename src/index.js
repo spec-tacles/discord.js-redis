@@ -28,5 +28,5 @@ module.exports = (client, options) => {
   client.on('guildUpdate', (o, n) => r.setGuild(n));
   client.on('messageUpdate', (o, n) => r.setMessage(n));
 
-  return r;
+  return r.client;
 };
