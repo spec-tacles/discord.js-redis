@@ -15,6 +15,7 @@ module.exports = class RedisInterface {
     client.guilds.forEach(g => q.hmset(`guild:${g.id}`, g));
     client.emojis.forEach(e => q.hmset(`emoji:${e.id}`, e));
     client.channels.forEach(c => q.hmset(`channel:${c.id}`, c));
+    q.hmset('user:me', RedisInterface.clean(client.user));
     return q.execAsync();
   }
 
@@ -27,6 +28,7 @@ module.exports = class RedisInterface {
   }
 
   setUser(user) {
+    if (user.client.user.id === user.id) this.client.hmsetAsync('user:me', RedisInterface.clean(user));
     return this._setData('user', user);
   }
 
