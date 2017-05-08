@@ -3,7 +3,7 @@ const RedisInterface = require('./RedisInterface');
 
 module.exports = (options) => {
   const r = new RedisInterface(options);
-  return (client) => {
+  return Object.assign((client) => {
     // eslint-disable-next-line no-param-reassign
     client.dataManager = new ClientDataManager(client, r);
     client.once('ready', () => {
@@ -27,5 +27,7 @@ module.exports = (options) => {
     client.on('emojiUpdate', (o, n) => r.setEmoji(n));
     client.on('guildUpdate', (o, n) => r.setGuild(n));
     client.on('messageUpdate', (o, n) => r.setMessage(n));
-  };
+
+    return r.client;
+  }, { redis: r.client });
 };
