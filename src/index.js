@@ -1,11 +1,11 @@
-const ClientDataManager = require('./ClientDataManagerExtension');
+const ClientDataManagerExtension = require('./ClientDataManagerExtension');
 const RedisInterface = require('./RedisInterface');
 
 module.exports = (client, options) => {
   const r = new RedisInterface(options);
 
   // eslint-disable-next-line no-param-reassign
-  client.dataManager = new ClientDataManager(client, r);
+  client.dataManager = new ClientDataManagerExtension(client, r);
   client.once('ready', () => {
     const q = r.client.multi();
     const queries = client.users.map(u => q.hmsetAsync(`user:${u.id}`, RedisInterface.clean(u)));

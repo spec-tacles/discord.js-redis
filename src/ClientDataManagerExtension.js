@@ -1,16 +1,3 @@
-const {
-  Constants,
-  Util,
-  Guild,
-  User,
-  DMChannel,
-  Emoji,
-  TextChannel,
-  VoiceChannel,
-  GuildChannel,
-  GroupDMChannel,
-} = require('discord.js');
-
 const DataManager = require('discord.js/src/client/ClientDataManager');
 
 class ClientDataManagerExtension extends DataManager {
