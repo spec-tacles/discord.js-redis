@@ -7,11 +7,8 @@ const discord = require('discord.js');
 const client = new discord.Client();
 
 describe('initialization', function() {
-  it('should connect to redis', function() {
-    redis = redis();
-  });
   it('should initialize the redis interface', function() {
-    redis(client);
+    redis = redis(client);
   });
   it('should login to Discord', function() {
     return client.login(process.env.DISCORD_TOKEN);
