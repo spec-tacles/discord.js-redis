@@ -28,6 +28,6 @@ module.exports = (options) => {
     client.on('guildUpdate', (o, n) => r.setGuild(n));
     client.on('messageUpdate', (o, n) => r.setMessage(n));
 
-    return r.client;
-  }, { redis: r.client });
+    return r;
+  }, { redis: r });
 };
