@@ -15,7 +15,7 @@ module.exports = class RedisInterface {
     client.guilds.forEach(g => q.sadd('guild', g.id));
     client.emojis.forEach(e => q.sadd('emoji', e.id));
     client.channels.forEach(c => q.sadd('channel', c.id));
-    q.add('me', client.user.id);
+    q.set('me', client.user.id);
     return q.execAsync();
   }
 
@@ -28,7 +28,6 @@ module.exports = class RedisInterface {
   }
 
   addUser(user) {
-    if (user.client.user.id === user.id) this.client.hmaddAsync('user:me', RedisInterface.clean(user));
     return this._addData('user', user.id);
   }
 
