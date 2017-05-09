@@ -54,7 +54,7 @@ module.exports = class RedisInterface {
   addMessage(message) {
     return this._addData('message', message.id).then(() => {
       const cache = message.client.options.messageCacheLifetime;
-      if (cache) return this.client.expireAsync(`message:${message.id}`, cache);
+      if (cache) setTimeout(() => this.removeMessage(message), cache);
       return Promise.resolve(null);
     });
   }
