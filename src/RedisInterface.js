@@ -11,67 +11,67 @@ module.exports = class RedisInterface {
 
   init(client) {
     const q = this.client.multi();
-    client.users.forEach(u => q.hmset(`user:${u.id}`, u));
-    client.guilds.forEach(g => q.hmset(`guild:${g.id}`, g));
-    client.emojis.forEach(e => q.hmset(`emoji:${e.id}`, e));
-    client.channels.forEach(c => q.hmset(`channel:${c.id}`, c));
-    q.hmset('user:me', RedisInterface.clean(client.user));
+    client.users.forEach(u => q.sadd('user', u.id));
+    client.guilds.forEach(g => q.sadd('guild', g.id));
+    client.emojis.forEach(e => q.sadd('emoji', e.id));
+    client.channels.forEach(c => q.sadd('channel', c.id));
+    q.add('me', client.user.id);
     return q.execAsync();
   }
 
-  setChannel(channel) {
-    return this._setData('channel', channel);
+  addChannel(channel) {
+    return this._addData('channel', channel.id);
   }
 
-  deleteChannel(channel) {
-    return this._deleteData('channel', channel.id);
+  removeChannel(channel) {
+    return this._removeData('channel', channel.id);
   }
 
-  setUser(user) {
-    if (user.client.user.id === user.id) this.client.hmsetAsync('user:me', RedisInterface.clean(user));
-    return this._setData('user', user);
+  addUser(user) {
+    if (user.client.user.id === user.id) this.client.hmaddAsync('user:me', RedisInterface.clean(user));
+    return this._addData('user', user.id);
   }
 
-  deleteUser(user) {
-    return this._deleteData('user', user.id);
+  removeUser(user) {
+    return this._removeData('user', user.id);
   }
 
-  setGuild(guild) {
-    return this._setData('guild', guild);
+  addGuild(guild) {
+    return this._addData('guild', guild.id);
   }
 
-  deleteGuild(guild) {
-    return this._deleteData('guild', guild.id);
+  removeGuild(guild) {
+    return this._removeData('guild', guild.id);
   }
 
-  setEmoji(emoji) {
-    return this._setData('emoji', emoji);
+  addEmoji(emoji) {
+    return this._addData('emoji', emoji.id);
   }
 
-  deleteEmoji(emoji) {
-    return this._deleteData('emoji', emoji.id);
+  removeEmoji(emoji) {
+    return this._removeData('emoji', emoji.id);
   }
 
-  setMessage(message) {
-    return this._setData('message', message).then(() => {
+  addMessage(message) {
+    return this._addData('message', message.id).then(() => {
       const cache = message.client.options.messageCacheLifetime;
       if (cache) return this.client.expireAsync(`message:${message.id}`, cache);
       return Promise.resolve(null);
     });
   }
 
-  deleteMessage(message) {
-    return this._deleteData('message', message.id);
+  removeMessage(message) {
+    return this._removeData('message', message.id);
   }
 
-  _setData(type, data) {
-    return this.client.hmsetAsync(`${type}:${data.id}`, RedisInterface.clean(data)).then(
-      result => this.client.publish(`${type}Set`, data.id).then(() => result));
+  _addData(type, id) {
+    return this.client.saddAsync(type, id).then(
+      result => this.client.publish(`${type}add`, id).then(() => result));
   }
 
-  _deleteData(type, id) {
-    return this.client.hdelAsync(`${type}:${id}`).then(
-      result => this.client.publish(`${type}Delete`, id).then(() => result));
+  _removeData(type, id) {
+    return this.client.sremAsync(type, id).then(
+      result => this.client.publish(`${type}remove`, id).then(() => result));
   }
 
   static clean(obj) {

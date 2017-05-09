@@ -6,27 +6,32 @@ module.exports = (client, options) => {
 
   // eslint-disable-next-line no-param-reassign
   client.dataManager = new ClientDataManagerExtension(client, r);
+
   client.once('ready', () => {
     const q = r.client.multi();
-    const queries = client.users.map(u => q.hmsetAsync(`user:${u.id}`, RedisInterface.clean(u)));
-    queries.push(...client.channels.map(c => q.hmsetAsync(`channel:${c.id}`, RedisInterface.clean(c))));
-    queries.push(...client.guilds.map(g => q.hmsetAsync(`guild:${g.id}`, RedisInterface.clean(g))));
-    queries.push(...client.emojis.map(e => q.hmsetAsync(`emoji:${e.id}`, RedisInterface.clean(e))));
+    const queries = client.users.map(u => q.saddAsync('user', u.id));
+    queries.push(...client.channels.map(c => q.saddAsync('channel', c.id)));
+    queries.push(...client.guilds.map(g => q.saddAsync('guild', g.id)));
+    queries.push(...client.emojis.map(e => q.saddAsync('emoji', e.id)));
     return Promise.all(queries).then(() => q.execAsync());
   });
-  client.on('message', r.setMessage.bind(this));
-  client.on('messageDelete', r.deleteMessage.bind(this));
-  client.on('messageUpdate', (o, n) => r.setMessage(n));
+
+  client.on('message', r.addMessage.bind(this));
+  client.on('messageDelete', r.removeMessage.bind(this));
   client.on('messageDeleteBulk', (messages) => {
     const q = r.client.multi();
-    return Promise.all(messages.map(m => q.hdelAsync(`message:${m.id}`)))
+    return Promise.all(messages.map(m => q.sremAsync('message', m.id)))
       .then(() => q.execAsync());
   });
-  client.on('userUpdate', (o, n) => r.setUser(n));
-  client.on('channelUpdate', (o, n) => r.setChannel(n));
-  client.on('emojiUpdate', (o, n) => r.setEmoji(n));
-  client.on('guildUpdate', (o, n) => r.setGuild(n));
-  client.on('messageUpdate', (o, n) => r.setMessage(n));
+
+  client.on('emojiCreate', r.addEmoji.bind(this));
+  client.on('emojiDelete', r.removeEmoji.bind(this));
+
+  client.on('channelCreate', r.addChannel.bind(this));
+  client.on('channelDelete', r.removeChannel.bind(this));
+
+  client.on('guildCreate', r.addGuild.bind(this));
+  client.on('guildDelete', r.removeGuild.bind(this));
 
   return r.client;
 };
