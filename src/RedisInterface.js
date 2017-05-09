@@ -52,10 +52,10 @@ module.exports = class RedisInterface {
   }
 
   addMessage(message) {
-    return this._addData('message', message.id).then(() => {
+    return this._addData('message', message.id).then((res) => {
       const cache = message.client.options.messageCacheLifetime;
       if (cache) setTimeout(() => this.removeMessage(message), cache);
-      return Promise.resolve(null);
+      return res;
     });
   }
 
