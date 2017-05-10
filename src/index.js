@@ -22,7 +22,7 @@ class RedisClient extends EventEmitter {
     // eslint-disable-next-line no-param-reassign
     c.dataManager = new ClientDataManagerExtension(c, this.r);
 
-    if (c.status === 0) this._ready();
+    if (c.readyTimestamp) this._ready();
     else c.once('ready', this._ready.bind(this));
 
     c.on('message', this.r.addMessage.bind(this));
