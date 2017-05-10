@@ -10,9 +10,10 @@ describe('initialization', function() {
   it('should initialize the redis interface', function(done) {
     redis = redis(client);
 
-    const connectErrorListener = redis.once('error', e => { throw e; });
+    const connectErrorListener = e => { throw e; };
+    redis.once('error', connectErrorListener);
     redis.once('ready', () => {
-      redis.removeListener(connectErrorListener);
+      redis.removeListener('error', connectErrorListener);
       done();
     });
   });
