@@ -43,4 +43,10 @@ describe('data storage', function() {
       }));
     });
   });
+
+  it('contains client presence (non-sharded)', function() {
+    return redis.hgetallAsync('presences').then(data => {
+      assert.deepEqual(JSON.parse(data[0]), RedisInterface.flatten(discordClient.user.presence));
+    });
+  });
 });
