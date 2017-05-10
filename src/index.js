@@ -1,37 +1,51 @@
+const EventEmitter = require('events');
 const ClientDataManagerExtension = require('./ClientDataManagerExtension');
 const RedisInterface = require('./RedisInterface');
 
-module.exports = (client, options) => {
-  const r = new RedisInterface(options);
+class RedisClient extends EventEmitter {
+  constructor(client, options) {
+    super();
 
-  // eslint-disable-next-line no-param-reassign
-  client.dataManager = new ClientDataManagerExtension(client, r);
+    this.discordClient = client;
+    this.options = options;
 
-  client.once('ready', () => {
-    const q = r.client.multi();
-    const queries = client.users.map(u => q.saddAsync('user', u.id));
-    queries.push(...client.channels.map(c => q.saddAsync('channel', c.id)));
-    queries.push(...client.guilds.map(g => q.saddAsync('guild', g.id)));
-    queries.push(...client.emojis.map(e => q.saddAsync('emoji', e.id)));
-    return Promise.all(queries).then(() => q.execAsync());
-  });
+    this.ready = false;
+    this.on('ready', () => { this.ready = true; });
 
-  client.on('message', r.addMessage.bind(this));
-  client.on('messageDelete', r.removeMessage.bind(this));
-  client.on('messageDeleteBulk', (messages) => {
-    const q = r.client.multi();
-    return Promise.all(messages.map(m => q.sremAsync('message', m.id)))
-      .then(() => q.execAsync());
-  });
+    this.r = new RedisInterface(this.options);
+    this.redisClient = this.r.client;
+    this.redisClient.once('ready', () => this.initialize());
+  }
 
-  client.on('emojiCreate', r.addEmoji.bind(this));
-  client.on('emojiDelete', r.removeEmoji.bind(this));
+  initialize() {
+    const c = this.discordClient;
+    // eslint-disable-next-line no-param-reassign
+    c.dataManager = new ClientDataManagerExtension(c, this.r);
 
-  client.on('channelCreate', r.addChannel.bind(this));
-  client.on('channelDelete', r.removeChannel.bind(this));
+    if (c.status === 0) this._ready();
+    else c.once('ready', this._ready.bind(this));
 
-  client.on('guildCreate', r.addGuild.bind(this));
-  client.on('guildDelete', r.removeGuild.bind(this));
+    c.on('message', this.r.addMessage.bind(this));
+    c.on('messageDelete', this.r.removeMessage.bind(this));
+    c.on('messageDeleteBulk', (messages) => {
+      const q = this.redisClient.multi();
+      messages.forEach(m => q.sremAsync('message', m.id));
+      return q.execAsync();
+    });
 
-  return r.client;
-};
+    c.on('emojiCreate', this.r.addEmoji.bind(this));
+    c.on('emojiDelete', this.r.removeEmoji.bind(this));
+
+    c.on('channelCreate', this.r.addChannel.bind(this));
+    c.on('channelDelete', this.r.removeChannel.bind(this));
+
+    c.on('guildCreate', this.r.addGuild.bind(this));
+    c.on('guildDelete', this.r.removeGuild.bind(this));
+  }
+
+  _ready() {
+    this.r.init(this.discordClient).then(() => this.emit('ready', this));
+  }
+}
+
+module.exports = { RedisClient, RedisInterface };

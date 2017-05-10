@@ -17,19 +17,20 @@ module.exports = class RedisInterface {
     client.emojis.forEach(e => q.sadd('emoji', e.id));
     client.channels.forEach(c => q.sadd('channel', c.id));
 
-    q.hmset('me', {
+    q.hmset('me', RedisInterface.clean({
       id: client.user.id,
       username: client.user.username,
       disciminator: client.user.discriminator,
       avatar: client.user.avatar,
       bot: client.user.bot,
-    });
+    }));
 
     q.hmset('presences', {
-      [client.shard ? client.shard.id : 0]: RedisInterface.flatten(client.user.presence),
+      [client.shard ? client.shard.id : 0]:
+        JSON.stringify(RedisInterface.flatten(client.user.presence)),
     });
 
-    return q.execAsync();
+    return this.client.flushallAsync().then(() => q.execAsync());
   }
 
   addChannel(channel) {
@@ -89,7 +90,7 @@ module.exports = class RedisInterface {
   static clean(obj) {
     const out = {};
     Object.keys(obj).forEach((key) => {
-      if (!(obj[key] instanceof Object) && obj[key] !== null && typeof obj[key] !== 'undefined') out[key] = obj[key];
+      if (!(obj[key] instanceof Object) && obj[key] !== null && typeof obj[key] !== 'undefined') out[key] = `${obj[key]}`;
     });
     return out;
   }
