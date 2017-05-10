@@ -11,11 +11,24 @@ module.exports = class RedisInterface {
 
   init(client) {
     const q = this.client.multi();
+
     client.users.forEach(u => q.sadd('user', u.id));
     client.guilds.forEach(g => q.sadd('guild', g.id));
     client.emojis.forEach(e => q.sadd('emoji', e.id));
     client.channels.forEach(c => q.sadd('channel', c.id));
-    q.set('me', client.user.id);
+
+    q.hmset('me', {
+      id: client.user.id,
+      username: client.user.username,
+      disciminator: client.user.discriminator,
+      avatar: client.user.avatar,
+      bot: client.user.bot,
+    });
+
+    q.hmset('presences', {
+      [client.shard ? client.shard.id : 0]: RedisInterface.flatten(client.user.presence),
+    });
+
     return q.execAsync();
   }
 
@@ -77,6 +90,16 @@ module.exports = class RedisInterface {
     const out = {};
     Object.keys(obj).forEach((key) => {
       if (!(obj[key] instanceof Object) && obj[key] !== null && typeof obj[key] !== 'undefined') out[key] = obj[key];
+    });
+    return out;
+  }
+
+  static flatten(obj) {
+    const out = {};
+    Object.keys(obj).forEach((key) => {
+      if (obj[key] === null || typeof obj[key] === 'undefined') return;
+      if (obj[key] instanceof Object) Object.assign(out, this.flatten(obj));
+      else out[key] = obj[key];
     });
     return out;
   }
