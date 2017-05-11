@@ -2,7 +2,7 @@ const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 const assert = require('assert');
-const { RedisClient, RedisInterface } = require('../src/index.js');
+const { Client: RedisClient, RedisInterface } = require('../src/index.js');
 const discord = require('discord.js');
 
 let redis;
