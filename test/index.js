@@ -2,7 +2,7 @@ const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
 const assert = require('assert');
-const { Client: RedisClient, RedisInterface } = require('../src/index.js');
+const dRedis = require('../src/index.js');
 const discord = require('discord.js');
 
 let redis;
@@ -12,9 +12,9 @@ let discordClient;
 describe('data storage', function() {
   const connectErrorListener = e => { throw e; };
   before('initializes the redis interface', function() {
-    redisClient = new RedisClient(new discord.Client());
+    redisClient = new dRedis.Client(new discord.Client());
     discordClient = redisClient.discordClient;
-    redis = redisClient.redisClient;
+    redis = redisClient.client;
     redis.once('error', connectErrorListener);
   });
 
@@ -34,7 +34,7 @@ describe('data storage', function() {
 
   it('contains client data', function() {
     return redis.hgetallAsync('me').then(data => {
-      assert.deepEqual(data, RedisInterface.clean({
+      assert.deepEqual(data, dRedis.RedisInterface.clean({
         id: discordClient.user.id,
         username: discordClient.user.username,
         disciminator: discordClient.user.discriminator,
@@ -46,7 +46,7 @@ describe('data storage', function() {
 
   it('contains client presence (non-sharded)', function() {
     return redis.hgetallAsync('presences').then(data => {
-      assert.deepEqual(JSON.parse(data[0]), RedisInterface.flatten(discordClient.user.presence));
+      assert.deepEqual(JSON.parse(data[0]), dRedis.RedisInterface.flatten(discordClient.user.presence));
     });
   });
 });

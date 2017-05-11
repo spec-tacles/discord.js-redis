@@ -12,39 +12,39 @@ class RedisClient extends EventEmitter {
     this.ready = false;
     this.on('ready', () => { this.ready = true; });
 
-    this.r = new RedisInterface(this.options);
-    this.redisClient = this.r.client;
-    this.redisClient.once('ready', () => this.initialize());
+    this.interface = new RedisInterface(this.options);
+    this.client = this.interface.client;
+    this.initialize();
   }
 
   initialize() {
     const c = this.discordClient;
     // eslint-disable-next-line no-param-reassign
-    c.dataManager = new ClientDataManagerExtension(c, this.r);
+    c.dataManager = new ClientDataManagerExtension(c, this.interface);
 
     if (c.readyTimestamp) this._ready();
     else c.once('ready', this._ready.bind(this));
 
-    c.on('message', this.r.addMessage.bind(this));
-    c.on('messageDelete', this.r.removeMessage.bind(this));
+    c.on('message', this.interface.addMessage.bind(this));
+    c.on('messageDelete', this.interface.removeMessage.bind(this));
     c.on('messageDeleteBulk', (messages) => {
-      const q = this.redisClient.multi();
+      const q = this.client.multi();
       messages.forEach(m => q.sremAsync('message', m.id));
       return q.execAsync();
     });
 
-    c.on('emojiCreate', this.r.addEmoji.bind(this));
-    c.on('emojiDelete', this.r.removeEmoji.bind(this));
+    c.on('emojiCreate', this.interface.addEmoji.bind(this));
+    c.on('emojiDelete', this.interface.removeEmoji.bind(this));
 
-    c.on('channelCreate', this.r.addChannel.bind(this));
-    c.on('channelDelete', this.r.removeChannel.bind(this));
+    c.on('channelCreate', this.interface.addChannel.bind(this));
+    c.on('channelDelete', this.interface.removeChannel.bind(this));
 
-    c.on('guildCreate', this.r.addGuild.bind(this));
-    c.on('guildDelete', this.r.removeGuild.bind(this));
+    c.on('guildCreate', this.interface.addGuild.bind(this));
+    c.on('guildDelete', this.interface.removeGuild.bind(this));
   }
 
   _ready() {
-    this.r.init(this.discordClient).then(() => this.emit('ready', this));
+    this.interface.init(this.discordClient).then(() => this.emit('ready', this));
   }
 }
 
