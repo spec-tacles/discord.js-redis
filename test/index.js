@@ -32,21 +32,27 @@ describe('data storage', function() {
     }
   });
 
-  it('contains client data', function() {
-    return redis.hgetallAsync('me').then(data => {
-      assert.deepEqual(data, dRedis.RedisInterface.clean({
-        id: discordClient.user.id,
-        username: discordClient.user.username,
-        disciminator: discordClient.user.discriminator,
-        avatar: discordClient.user.avatar,
-        bot: discordClient.user.bot,
-      }));
+  it('contains all users', function() {
+    return redis.smembersAsync('users').then(list => {
+      assert.deepEqual(list.sort(), discordClient.users.map(u => u.id).sort());
     });
   });
 
-  it('contains client presence (non-sharded)', function() {
-    return redis.hgetallAsync('presences').then(data => {
-      assert.deepEqual(JSON.parse(data[0]), dRedis.RedisInterface.flatten(discordClient.user.presence));
+  it('contains all guilds', function() {
+    return redis.smembersAsync('guilds').then(list => {
+      assert.deepEqual(list.sort(), discordClient.guilds.map(g => g.id).sort());
+    });
+  });
+
+  it('contains all channels', function() {
+    return redis.smembersAsync('channels').then(list => {
+      assert.deepEqual(list.sort(), discordClient.channels.map(c => c.id).sort());
+    });
+  });
+
+  it('contains all emojis', function() {
+    return redis.smembersAsync('emojis').then(list => {
+      assert.deepEqual(list.sort(), discordClient.emojis.map(e => e.id).sort());
     });
   });
 });
