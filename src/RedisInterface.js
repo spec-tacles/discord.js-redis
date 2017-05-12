@@ -81,14 +81,4 @@ module.exports = class RedisInterface {
     });
     return out;
   }
-
-  static flatten(obj) {
-    const out = {};
-    Object.keys(obj).forEach((key) => {
-      if (obj[key] === null || typeof obj[key] === 'undefined') return;
-      if (obj[key] instanceof Object) Object.assign(out, this.flatten(obj));
-      else out[key] = obj[key];
-    });
-    return out;
-  }
 };
