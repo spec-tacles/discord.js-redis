@@ -66,12 +66,12 @@ module.exports = class RedisInterface {
 
   _addData(type, id) {
     return this.client.saddAsync(type, id).then(
-      result => this.client.publish(`${type}Add`, id).then(() => result));
+      result => this.client.publishAsync(`${type}Add`, id).then(() => result));
   }
 
   _removeData(type, id) {
     return this.client.sremAsync(type, id).then(
-      result => this.client.publish(`${type}Remove`, id).then(() => result));
+      result => this.client.publishAsync(`${type}Remove`, id).then(() => result));
   }
 
   static clean(obj) {
