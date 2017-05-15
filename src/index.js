@@ -25,22 +25,22 @@ class RedisClient extends EventEmitter {
     if (c.readyTimestamp) this._ready();
     else c.once('ready', this._ready.bind(this));
 
-    c.on('message', this.interface.addMessage.bind(this));
-    c.on('messageDelete', this.interface.removeMessage.bind(this));
+    c.on('message', m => this.interface.addMessage(m));
+    c.on('messageDelete', m => this.interface.removeMessage(m));
     c.on('messageDeleteBulk', (messages) => {
       const q = this.client.multi();
       messages.forEach(m => q.sremAsync('message', m.id));
       return q.execAsync();
     });
 
-    c.on('emojiCreate', this.interface.addEmoji.bind(this));
-    c.on('emojiDelete', this.interface.removeEmoji.bind(this));
+    c.on('emojiCreate', e => this.interface.addEmoji(e));
+    c.on('emojiDelete', e => this.interface.removeEmoji(e));
 
-    c.on('channelCreate', this.interface.addChannel.bind(this));
-    c.on('channelDelete', this.interface.removeChannel.bind(this));
+    c.on('channelCreate', ch => this.interface.addChannel(ch));
+    c.on('channelDelete', ch => this.interface.removeChannel(ch));
 
-    c.on('guildCreate', this.interface.addGuild.bind(this));
-    c.on('guildDelete', this.interface.removeGuild.bind(this));
+    c.on('guildCreate', g => this.interface.addGuild(g));
+    c.on('guildDelete', g => this.interface.removeGuild(g));
   }
 
   _ready() {
