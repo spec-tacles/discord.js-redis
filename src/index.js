@@ -1,5 +1,4 @@
 const EventEmitter = require('events');
-const ClientDataManagerExtension = require('./ClientDataManagerExtension');
 const RedisInterface = require('./RedisInterface');
 
 class RedisClient extends EventEmitter {
@@ -19,8 +18,6 @@ class RedisClient extends EventEmitter {
 
   initialize() {
     const c = this.discordClient;
-    // eslint-disable-next-line no-param-reassign
-    c.dataManager = new ClientDataManagerExtension(c, this.interface);
 
     if (c.readyTimestamp) this._ready();
     else c.once('ready', this._ready.bind(this));
@@ -41,6 +38,8 @@ class RedisClient extends EventEmitter {
 
     c.on('guildCreate', g => this.interface.addGuild(g));
     c.on('guildDelete', g => this.interface.removeGuild(g));
+
+    c.on('guildMemberAdd', m => this.interface.addMember(m));
   }
 
   _ready() {
