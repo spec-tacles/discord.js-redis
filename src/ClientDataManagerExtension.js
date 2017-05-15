@@ -7,8 +7,8 @@ class ClientDataManagerExtension extends DataManager {
   }
 
   newUser(data) {
-    const user = super.addUser(data);
-    if (this.pastReady) this.redis.setUser(user);
+    const user = super.newUser(data);
+    if (this.pastReady) this.redis.addUser(user);
     return user;
   }
 
