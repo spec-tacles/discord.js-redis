@@ -70,13 +70,17 @@ module.exports = class RedisInterface {
   }
 
   _addData(type, id) {
-    return this.client.saddAsync(type, id).then(
-      result => this.client.publishAsync(`${type}Add`, id).then(() => result));
+    return Promise.all([
+      this.client.saddAsync(type, id),
+      this.client.publishAsync(`${type}Add`, id),
+    ]);
   }
 
   _removeData(type, id) {
-    return this.client.sremAsync(type, id).then(
-      result => this.client.publishAsync(`${type}Remove`, id).then(() => result));
+    return Promise.all([
+      this.client.sremAsync(type, id),
+      this.client.publishAsync(`${type}Remove`, id),
+    ]);
   }
 
   static clean(obj) {
