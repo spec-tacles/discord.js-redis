@@ -21,8 +21,10 @@ module.exports = class RedisInterface {
   }
 
   async addMember(member) {
-    if (await this.client.sismemberAsync('users', member.id)) return Promise.resolve();
-    return this.addUser(member.user);
+    return this.client.sismemberAsync('users', member.id).then((is) => {
+      if (is) return Promise.resolve();
+      return this.addUser(member.user);
+    });
   }
 
   addChannel(channel) {
