@@ -20,7 +20,7 @@ module.exports = class RedisInterface {
     return this.client.flushallAsync().then(() => q.execAsync());
   }
 
-  async addMember(member) {
+  addMember(member) {
     return this.client.sismemberAsync('users', member.id).then((is) => {
       if (is) return Promise.resolve();
       return this.addUser(member.user);
