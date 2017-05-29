@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/spec-tacles/discord.js-redis.svg?branch=master)](https://travis-ci.org/spec-tacles/discord.js-redis)
 
-Integrates Discord.js caching with Redis.  Stores users, guilds, channels, messages, and emojis in a hash map keyed by `[type]:[id]`.  You can subscribe to channels named `[type]Set` and `[type]Delete` which will contain a payload of the resource ID.
+Integrates Discord.js caching with Redis.  Stores users, guilds, channels, messages, and emojis in a hash set of IDs (keys are the plural of the type: e.g. `users`, `messages`, etc.).  You can subscribe to channels named `[type]Set` and `[type]Delete` which will contain a payload of the resource ID.
 
 ## Example
 ```js
