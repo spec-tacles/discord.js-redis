@@ -47,4 +47,4 @@ class RedisClient extends EventEmitter {
   }
 }
 
-module.exports = { Client: RedisClient, RedisInterface };
+module.exports = { RedisClient, RedisInterface };
