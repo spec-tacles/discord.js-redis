@@ -12,7 +12,7 @@ let discordClient;
 describe('data storage', function() {
   const connectErrorListener = e => { throw e; };
   before('initializes the redis interface', function() {
-    redisClient = new dRedis.Client(new discord.Client());
+    redisClient = new dRedis.RedisClient(new discord.Client());
     discordClient = redisClient.discordClient;
     redis = redisClient.client;
     redis.once('error', connectErrorListener);
