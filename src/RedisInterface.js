@@ -60,7 +60,7 @@ module.exports = class RedisInterface {
   }
 
   addMessage(message) {
-    return this._addData('messages', message.id).then((res) => {
+    return this._addData('messages', `${message.channel.id}:${message.id}`).then((res) => {
       const cache = message.client.options.messageCacheLifetime;
       if (cache) setTimeout(() => this.removeMessage(message), cache);
       return res;
@@ -68,7 +68,7 @@ module.exports = class RedisInterface {
   }
 
   removeMessage(message) {
-    return this._removeData('messages', message.id);
+    return this._removeData('messages', `${message.channel.id}:${message.id}`);
   }
 
   _addData(type, id) {
